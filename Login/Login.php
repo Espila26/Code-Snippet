@@ -65,12 +65,43 @@ span.psw {
     }
 }
 </style>
+
+<?php
+
+	$file = initializeFile( "usuarios.txt" );
+	
+	$array = [];
+	while ($data = fgets($file)) {
+		$array[] = unserialize( $data );
+	}
+	var_dump($array);
+	if( isset( $_POST[ 'login' ] ) ){
+			var_dump($_POST[ 'uname' ]);
+		if( $array[$_POST[ 'uname' ]] ){
+			echo"good";
+		}
+		else{
+			echo"bad :(";
+		}
+		
+	}
+	
+	function initializeFile( $path ){
+		if ( file_exists( $path ))
+			$file = fopen( $path, "r+" );
+		else
+			$file = fopen( $path, "a+" );
+		return $file;
+	}
+
+?>
+
 </head>
 <body>
 
 <h2>Login Form</h2>
 
-<form action="/action_page.php">
+<form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
   <div class="imgcontainer">
     <img src="img_avatar2.png" alt="Avatar" class="avatar">
   </div>
@@ -82,7 +113,7 @@ span.psw {
     <label for="psw"><b>Password</b></label>
     <input type="password" placeholder="Enter Password" name="psw" required>
         
-    <button type="submit">Login</button>
+    <button name="login" type="submit">Login</button>
     <label>
       <input type="checkbox" checked="checked" name="remember"> Remember me
     </label>

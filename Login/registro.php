@@ -89,9 +89,10 @@ button:hover {
 	if ( isset( $_POST[ 'signUp' ] ) && isset( $_POST[ 'username' ] ) && isset( $_POST[ 'psw' ] )) {
 	
 		$count = count( $array );
-		$user = array( 'id' => $count, 'username' => $_POST[ 'signUp' ], 'password' => $_POST[ 'psw' ] );
+		$user = array( 'id' => $count, 'username' => $_POST[ 'username' ], 'password' => $_POST[ 'psw' ] );
 		$string = str_pad( serialize( $user ), 50 );
 		fwrite( $file, $string );
+		header("Location: signIn.php");
 	
 	}
 	
