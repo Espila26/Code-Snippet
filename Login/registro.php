@@ -81,9 +81,15 @@ button:hover {
 <?php
 	$file = initializeFile( "usuarios.txt" );
 	
-	if ( isset( $_POST[ 'signUp' ] ) && isset( $_POST[ 'username' ] ) && isset( $_POST[ 'pasw' ] )) {
+	$array = [];
+	while ($data = fread($file,200)) {
+		$array[] = unserialize( $data );
+	}
 	
-		$user = array( 'username' => $_POST[ 'signUp' ], 'password' => $_POST[ 'pasw' ] );
+	if ( isset( $_POST[ 'signUp' ] ) && isset( $_POST[ 'username' ] ) && isset( $_POST[ 'psw' ] )) {
+	
+		$count = count( $array );
+		$user = array( 'id' => $count, 'username' => $_POST[ 'signUp' ], 'password' => $_POST[ 'psw' ] );
 		$string = str_pad( serialize( $user ), 50 );
 		fwrite( $file, $string );
 	
