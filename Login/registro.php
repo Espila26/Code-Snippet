@@ -1,5 +1,11 @@
 <!DOCTYPE html>
-<html>
+ 
+<html lang="es">
+ 
+<head>
+<title>Agenda</title>
+<meta charset="utf-8" />
+</head>
 <style>
 body {font-family: Arial, Helvetica, sans-serif;}
 * {box-sizing: border-box}
@@ -90,7 +96,7 @@ button:hover {
 
     <div class="clearfix">
       <button type="button" class="cancelbtn">Cancelar</button>
-      <button type="submit" class="signupbtn">Registrar</button>
+      <button name="signUp" type="submit" class="signupbtn">Registrar</button>
     </div>
   </div>
 </form>
