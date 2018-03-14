@@ -89,11 +89,25 @@ button:hover {
 	if ( isset( $_POST[ 'signUp' ] ) && isset( $_POST[ 'username' ] ) && isset( $_POST[ 'psw' ] )) {
 	
 		$count = count( $array );
-		$user = array( 'id' => $count, 'username' => $_POST[ 'username' ], 'password' => $_POST[ 'psw' ] );
-		$string = str_pad( serialize( $user ), 50 );
-		fwrite( $file, $string );
-		header("Location: signIn.php");
+		$userExists = userNameExists( $array, $_POST[ 'username' ], $_POST[ 'psw' ] );
+		if( $_POST[ 'psw' ] == $_POST[ 'psw-repeat' ] && !$userExists ){
+			$user = array( 'id' => $count, 'username' => $_POST[ 'username' ], 'password' => $_POST[ 'psw' ] );
+			$string = str_pad( serialize( $user ), 200 );
+			fwrite( $file, $string );
+			header("Location: signIn.php");
+		}else{
+			echo "Passwords do not match or username already exists";
+		}
 	
+	}
+	
+	function userNameExists( $array, $username, $password ){
+		foreach( $array  as $user ){
+			if( $user[ 'username' ] == $username && $user[ 'password' ] == $password ){
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	function initializeFile( $path ){

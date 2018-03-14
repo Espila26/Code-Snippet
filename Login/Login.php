@@ -71,17 +71,24 @@ span.psw {
 	$file = initializeFile( "usuarios.txt" );
 	
 	$array = [];
-	while ($data = fgets($file)) {
+	while ($data = fread($file,200)) {
 		$array[] = unserialize( $data );
 	}
 	var_dump($array);
 	if( isset( $_POST[ 'login' ] ) ){
-			var_dump($_POST[ 'uname' ]);
-		if( $array[$_POST[ 'uname' ]] ){
-			echo"good";
-		}
-		else{
-			echo"bad :(";
+		var_dump($_POST[ 'uname' ]);
+		$userWasFound = false;
+		if( $_POST[ 'uname' ] && $_POST[ 'psw' ] ){
+			foreach( $array  as $user ){
+				if( $user[ 'username' ] == $_POST[ 'uname' ] && 
+				    $user[ 'password' ] == $_POST[ 'psw' ] ){
+					echo"session started";
+					$userWasFound = true;
+				}
+			}
+		}	
+		if( !$userWasFound ){
+			echo "Username or password incorrect :(";
 		}
 		
 	}
