@@ -77,6 +77,28 @@ button:hover {
     }
 }
 </style>
+
+<?php
+	$file = initializeFile( "usuarios.txt" );
+	
+	if ( isset( $_POST[ 'signUp' ] ) && isset( $_POST[ 'username' ] ) && isset( $_POST[ 'pasw' ] )) {
+	
+		$user = array( 'username' => $_POST[ 'signUp' ], 'password' => $_POST[ 'pasw' ] );
+		$string = str_pad( serialize( $user ), 50 );
+		fwrite( $file, $string );
+	
+	}
+	
+	function initializeFile( $path ){
+		if ( file_exists( $path ))
+			$file = fopen( $path, "r+" );
+		else
+			$file = fopen( $path, "a+" );
+		return $file;
+	}
+
+?>
+
 <body>
 
 <form action="<?php echo $_SERVER['PHP_SELF']; ?>" style="border:1px solid #ccc" method="post">
