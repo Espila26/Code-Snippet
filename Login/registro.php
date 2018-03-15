@@ -97,7 +97,7 @@ button:hover {
 			fwrite( $file, $string );
 			chdir('C:\\ProjectDirectories\\');// Change the directory where we are to the one we want
 			createDirectory( 'C:\\ProjectDirectories\\' + $_POST[ 'username' ] );
-			header("Location: signIn.php");
+			header("Location: registro.php");
 		}else{
 			echo "Passwords do not match or username already exists";
 		}
