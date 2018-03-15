@@ -80,7 +80,8 @@ button:hover {
 
 <?php
 	$file = initializeFile( "usuarios.txt" );
-	
+	createDirectory( 'C:\\ProjectDirectories' );
+		
 	$array = [];
 	while ($data = fread($file,200)) {
 		$array[] = unserialize( $data );
@@ -94,6 +95,8 @@ button:hover {
 			$user = array( 'id' => $count, 'username' => $_POST[ 'username' ], 'password' => $_POST[ 'psw' ] );
 			$string = str_pad( serialize( $user ), 200 );
 			fwrite( $file, $string );
+			chdir('C:\\ProjectDirectories\\');// Change the directory where we are to the one we want
+			createDirectory( 'C:\\ProjectDirectories\\' + $_POST[ 'username' ] );
 			header("Location: signIn.php");
 		}else{
 			echo "Passwords do not match or username already exists";
@@ -116,6 +119,11 @@ button:hover {
 		else
 			$file = fopen( $path, "a+" );
 		return $file;
+	}
+	
+	function createDirectory( $path ){
+		if (!file_exists( $path ))
+			mkdir( $path, 0777, true );
 	}
 
 ?>
