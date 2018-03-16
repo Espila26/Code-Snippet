@@ -7,23 +7,29 @@
 	if( !isset( $_SESSION['userName'] ))
 		header("Location: Login.php");
 	
-	$userFiles = getUserFiles();
+	$metaArray = readMetaFile( 'metaData.txt' );
+	$metaDataFile = initializeFile( 'metaData.txt' );
 	if( isset( $_POST[ 'submit' ] ) ){
-		uploadFile();
-		header("Location: gestionarArchivos.php");
+		uploadFile( $metaDataFile, $metaArray );
 	}
 	
-	function uploadFile(){
+	function uploadFile( $metaDataFile, $metaArray ){
 		if ( $_FILES[ 'archivo' ][ "error" ] > 0 ){
 			echo "Error: " . $_FILES[ 'archivo' ][ 'error' ] . "<br>";
 		}else{
+			$name = $_FILES[ 'archivo' ][ 'name' ]."";
+			$size = round( $_FILES[ 'archivo' ][ 'size' ] / 1024 / 1024, 3);
+			$path = 'C:\\ProjectDirectories\\' . $_SESSION[ 'userName' ];
+			buildMetaData( $metaDataFile, $metaArray, "MetaData para: " . $name, $name, "uploadedFile",
+                    		$path, $_SESSION[ 'userName' ], " ", $size);
+
 			chdir( 'C:\\ProjectDirectories\\' );// Change the directory where we are to the one we want
 			move_uploaded_file( $_FILES[ 'archivo' ][ 'tmp_name' ],
 			"".$_SESSION[ 'userName' ]."/" . $_FILES[ 'archivo' ][ 'name' ]);
 		}
 	}
 	
-	function getUserFiles(){
+	function getUserFiles(){//no se esta usando de momento, ver si puede ser util o si no, borrarla
 		$path = 'C:\\ProjectDirectories\\' . $_SESSION['userName'];
 		chdir( $path );
 		$directory = opendir( "." ); //ruta actual
@@ -51,6 +57,44 @@
 		}
 		return $userFiles;
 	}
+	
+	function initializeFile( $path ){
+		if ( file_exists( $path ))
+			$file = fopen( $path, "r+" );
+		else
+			$file = fopen( $path, "a+" );
+		return $file;
+	}
+	
+	function buildMetaData( $file, $metaDataArray, $metaName , $name, $description, $path, $owner, $sharedWith, $size ){
+		$count = count( $metaDataArray );
+		$newArray = [];
+		$metaData = array( 'id' => $count, 'metaName' => $metaName, 'realName' => $name, 'description' => $description,
+                       	   'path' => $path, 'owner' => $owner, 'sharedWith' => $sharedWith, 'size' => $size);
+		array_push( $metaDataArray, $metaData );
+		foreach( $metaDataArray as $data){
+			array_push( $newArray, serialize( $data ));//Primero se mete cada array serializado dentro de un 
+		}                                              //array que guardara toda la metadata y luego se serializa el
+		$string = serialize( $newArray );              // array que contiene todas las metadatas
+		fwrite( $file, $string );
+		header("Location: gestionarArchivos.php");
+	}
+	
+	function readMetaFile( $file ){
+		$fp = fopen($file, "r");
+		if( filesize( $file ) > 0){
+		$contents = fread($fp, filesize( $file ));
+		$array = unserialize( $contents );
+		$newArray = [];
+		
+		foreach( $array as $data ){
+			array_push( $newArray, unserialize( $data ));
+		}
+		return $newArray;
+		}
+		return [];
+		
+	}
 
 	?>
 	
@@ -63,7 +107,7 @@
 		
 		<div>
 		<?php
-		if( isset( $userFiles )){
+		if( isset( $metaArray )){
 		?>
 		<table>
 		<h1>Archivos</h1>
@@ -75,23 +119,20 @@
 				$contFiles = 0;
 				$contFolders = 0;
 				$totalSize = 0;
-				foreach( $userFiles as $file ){
+				foreach( $metaArray as $array ){
 				?>
 					<tr>
 						<form method="post">
-							<td> <?php echo $file[ 'name' ] ?> </td>
-							<td> <?php echo $file['size']. " MB" ?> </td>
+							<td> <?php echo $array[ 'metaName' ] ?> </td>
+							<td> <?php echo $array['size']. " MB" ?> </td>
 						</form>
 					</tr>
 				<?php
-				if( $file[ 'isFolder' ] == true )
-					$contFolders++;
-				else
-					$contFiles++;
-				$totalSize = $totalSize + $file[ 'size' ];
+				  $contFiles++;
+				  $totalSize = $totalSize + $array[ 'size' ];
 				}
 	    		?>
-				<tr><?php echo $contFolders. " Carpetas - " . $contFiles ." Archivos(" .$totalSize. " MB)" ?> </tr>
+				<tr><?php echo $contFiles ." Archivos(" .$totalSize. " MB)" ?> </tr>
 		</table>
 		<?php
 		}
