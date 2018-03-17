@@ -120,16 +120,18 @@
 				$contFolders = 0;
 				$totalSize = 0;
 				foreach( $metaArray as $array ){
-				?>
-					<tr>
-						<form method="post">
-							<td> <?php echo $array[ 'metaName' ] ?> </td>
-							<td> <?php echo $array['size']. " MB" ?> </td>
-						</form>
-					</tr>
-				<?php
-				  $contFiles++;
-				  $totalSize = $totalSize + $array[ 'size' ];
+					if( $array['owner'] == $_SESSION[ 'userName' ] ){
+						?>
+							<tr>
+								<form method="post">
+									<td> <?php echo $array[ 'metaName' ] ?> </td>
+									<td> <?php echo $array['size']. " MB" ?> </td>
+								</form>
+							</tr>
+						<?php
+						  $contFiles++;
+						  $totalSize = $totalSize + $array[ 'size' ];
+					}
 				}
 	    		?>
 				<tr><?php echo $contFiles ." Archivos(" .$totalSize. " MB)" ?> </tr>
