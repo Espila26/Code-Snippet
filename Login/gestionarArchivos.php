@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html>
 	<head>
+	<meta charset="utf-8">
+    <title>Gestionar Archivos PHP</title>
+	<link href="estilos/gestionarArchivos.css" type="text/css" rel="stylesheet"/>
 	<?php
 	session_start();
 	
@@ -22,6 +25,12 @@
 				//delete code
 			}
 		}
+	}
+	
+		
+	if( isset( $_POST[ 'logout' ] )){
+		unset( $_SESSION[ 'userName' ] );
+		header("Location: Login.php");
 	}
 	
 	function uploadFile( $metaDataFile, $metaArray ){
@@ -119,13 +128,24 @@
 	?>
 	
     </head>
+	<header>
+		<form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
+			<img src="imagenes/php.PNG" alt="Image">
+			<input type="text" name="search" placeholder="Buscar Archivo..">
+			<input type="submit" name="logout" class="logout" value="">
+		</form>
+	</header>
     <body>
-        <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post" enctype="multipart/form-data">
-            <input type="file" name="archivo" id="archivo"></input>
-            <input type="submit" name="submit" value="Subir archivo"></input>
-        </form>
+		<h1>Administrador de Archivos PHP</h1>
+		<div class="uploadFile">
+			<h2>Archivo a subir:</h2>
+			<form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post" enctype="multipart/form-data">
+				<input class="custom-file-input" type="file" name="archivo" id="archivo"></input></br></br>
+				<input class='button'  type="submit" name="submit" value="Subir archivo"></input>
+			</form>
+		</div>
 		
-		<div>
+		<div class="showFiles">
 		<?php
 		if( isset( $metaArray )){
 		$contFiles = 0;
@@ -133,11 +153,11 @@
 		$totalSize = 0;
 		echo "<form action= ".$_SERVER['PHP_SELF']." method='post'>
 		<table>
-		<h1>Archivos</h1>
+		<h2>Archivos de " .$_SESSION[ 'userName' ]. "</h2>
 			<tr>
 				<th>Nombre</th>
 				<th>Tamanno</th>
-				<th> </th>
+				<th>Accion</th>
 			</tr>";
 			foreach( $metaArray as $array ){
 				if( $array['owner'] == $_SESSION[ 'userName' ] ){
@@ -150,12 +170,13 @@
 						 $totalSize = $totalSize + $array[ 'size' ];
 				}
 			}
-			echo" <tr>".$contFiles." Archivos(" .$totalSize. " MB) </tr>
-			<tr> <input type='submit' name='edit' value='Editar'> </input> </tr>
-			<tr> <input type='submit' name='delete' value='Eliminar'> </input> </tr>
+			echo" <tr><td></td><td>".$contFiles." Archivos(" .$totalSize. " MB) </td>
+			<td> <input class='button' type='submit' name='show' value='Mostrar'> </input>
+			<input class='button' type='submit' name='edit' value='Editar'> </input>
+			<input class='button' type='submit' name='delete' value='Eliminar'> </input> </td></tr>
 		</table>
 		</form>";
 		}?>
-		</div>
+		</div>		
     </body>
 </html>
