@@ -12,6 +12,17 @@
 	if( isset( $_POST[ 'submit' ] ) ){
 		uploadFile( $metaDataFile, $metaArray );
 	}
+	if( isset( $_POST[ 'edit' ] ) || isset( $_POST[ 'delete' ] )){
+		echo"yes";
+		if( isset( $_POST[ 'metaDataCheckBox' ] ) ){
+			$valuesChecked = getCheckBoxValues( $_POST[ 'metaDataCheckBox' ]);
+			if( isset( $_POST[ 'edit' ] )){
+				var_dump( $valuesChecked );
+			}else{
+				//delete code
+			}
+		}
+	}
 	
 	function uploadFile( $metaDataFile, $metaArray ){
 		if ( $_FILES[ 'archivo' ][ "error" ] > 0 ){
@@ -93,7 +104,16 @@
 		return $newArray;
 		}
 		return [];
-		
+	}
+	
+	function getCheckBoxValues( $checkBox ){
+		$values = [];
+		if( isset( $checkBox ) ){
+			foreach($checkBox as $selected){
+				array_push( $values, $selected );
+			}
+		}
+		return $values;
 	}
 
 	?>
@@ -108,38 +128,34 @@
 		<div>
 		<?php
 		if( isset( $metaArray )){
-		?>
+		$contFiles = 0;
+		$contFolders = 0;
+		$totalSize = 0;
+		echo "<form action= ".$_SERVER['PHP_SELF']." method='post'>
 		<table>
 		<h1>Archivos</h1>
 			<tr>
 				<th>Nombre</th>
 				<th>Tamanno</th>
-			</tr>
-				<?php
-				$contFiles = 0;
-				$contFolders = 0;
-				$totalSize = 0;
-				foreach( $metaArray as $array ){
-					if( $array['owner'] == $_SESSION[ 'userName' ] ){
-						?>
-							<tr>
-								<form method="post">
-									<td> <?php echo $array[ 'metaName' ] ?> </td>
-									<td> <?php echo $array['size']. " MB" ?> </td>
-								</form>
-							</tr>
-						<?php
-						  $contFiles++;
-						  $totalSize = $totalSize + $array[ 'size' ];
-					}
+				<th> </th>
+			</tr>";
+			foreach( $metaArray as $array ){
+				if( $array['owner'] == $_SESSION[ 'userName' ] ){
+					echo"<tr>
+							<td> ".$array[ 'metaName' ]." </td>
+							<td> ".$array['size']." MB  </td>
+							<td> <input name=metaDataCheckBox[] type=checkbox value= ".$array['id']." > </td>
+						 </tr>";
+						 $contFiles++;
+						 $totalSize = $totalSize + $array[ 'size' ];
 				}
-	    		?>
-				<tr><?php echo $contFiles ." Archivos(" .$totalSize. " MB)" ?> </tr>
+			}
+			echo" <tr>".$contFiles." Archivos(" .$totalSize. " MB) </tr>
+			<tr> <input type='submit' name='edit' value='Editar'> </input> </tr>
+			<tr> <input type='submit' name='delete' value='Eliminar'> </input> </tr>
 		</table>
-		<?php
-		}
-		?>
+		</form>";
+		}?>
 		</div>
-		
     </body>
 </html>
