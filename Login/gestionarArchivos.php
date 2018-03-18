@@ -71,7 +71,7 @@
 			$size = round( $_FILES[ 'archivo' ][ 'size' ] / 1024 / 1024, 3);
 			$path = 'C:\\ProjectDirectories\\' . $_SESSION[ 'userName' ];
 			buildMetaData( $metaDataFile, $metaArray, "MetaData para: " . $name, $name, "uploadedFile",
-                    		$path, $_SESSION[ 'userName' ], " ", $size);
+                    		$path, $_SESSION[ 'userName' ], " ", $size, false);
 
 			chdir( 'C:\\ProjectDirectories\\' );// Change the directory where we are to the one we want
 			move_uploaded_file( $_FILES[ 'archivo' ][ 'tmp_name' ],
@@ -124,10 +124,10 @@
 		return $array;
 	}
 	
-	function buildMetaData( $file, $metaDataArray, $metaName , $name, $description, $path, $owner, $sharedWith, $size ){
+	function buildMetaData( $file, $metaDataArray, $metaName , $name, $description, $path, $owner, $sharedWith, $size, $deleted ){
 		$count = count( $metaDataArray );
 		$metaData = array( 'id' => $count, 'metaName' => $metaName, 'realName' => $name, 'description' => $description,
-                       	   'path' => $path, 'owner' => $owner, 'sharedWith' => $sharedWith, 'size' => $size);
+                       	   'path' => $path, 'owner' => $owner, 'sharedWith' => $sharedWith, 'size' => $size, 'deleted' => $deleted);
 		array_push( $metaDataArray, $metaData );
 		saveFileSerialized( $file, $metaDataArray );
 	}
@@ -202,7 +202,7 @@
 				<th>Accion</th>
 			</tr>";
 			foreach( $metaArray as $array ){
-				if( $array['owner'] == $_SESSION[ 'userName' ] ){
+				if( $array['owner'] == $_SESSION[ 'userName' ] && $array[ 'deleted' ] == false ){
 					echo"<tr>
 							<td> <a href='".$array[ 'path' ]."/".$array[ 'realName' ]."'> ".$array[ 'metaName' ]."  </a> </td>
 							<td> ".$array['size']." MB  </td>
