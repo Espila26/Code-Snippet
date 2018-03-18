@@ -20,13 +20,24 @@
 		if( isset( $_POST[ 'metaDataCheckBox' ] ) ){
 			$valuesChecked = getCheckBoxValues( $_POST[ 'metaDataCheckBox' ]);
 			if( isset( $_POST[ 'edit' ] )){
-				var_dump( $valuesChecked );
+				if(count($valuesChecked)>1){
+					header("Location: gestionarArchivos.php");
+					echo"solo es posible editar un archivo a la vez";//recordar meter errores en un session
+				}
 			}else{
 				//delete code
 			}
 		}
 	}
 	
+	if( isset( $_POST[ 'submitEdit' ] )){
+		$index = $_POST[ 'metaIndex' ];
+		$valueToEdit = $metaArray[ $index ];
+		$valueToEdit[ 'metaName' ] = $_POST[ 'metaName' ];
+		$valueToEdit[ 'description' ] = $_POST[ 'metaDescription' ];
+		$metaArray[ $index ] = $valueToEdit;
+		saveFileSerialized( $metaDataFile, $metaArray );
+	}
 		
 	if( isset( $_POST[ 'logout' ] )){
 		unset( $_SESSION[ 'userName' ] );
@@ -88,11 +99,16 @@
 	
 	function buildMetaData( $file, $metaDataArray, $metaName , $name, $description, $path, $owner, $sharedWith, $size ){
 		$count = count( $metaDataArray );
-		$newArray = [];
 		$metaData = array( 'id' => $count, 'metaName' => $metaName, 'realName' => $name, 'description' => $description,
                        	   'path' => $path, 'owner' => $owner, 'sharedWith' => $sharedWith, 'size' => $size);
 		array_push( $metaDataArray, $metaData );
-		foreach( $metaDataArray as $data){
+		saveFileSerialized( $file, $metaDataArray );
+	}
+	
+	function saveFileSerialized( $file, $array ){
+		var_dump($array);
+		$newArray = [];
+		foreach( $array as $data){
 			array_push( $newArray, serialize( $data ));//Primero se mete cada array serializado dentro de un 
 		}                                              //array que guardara toda la metadata y luego se serializa el
 		$string = serialize( $newArray );              // array que contiene todas las metadatas
@@ -131,7 +147,7 @@
 	<header>
 		<form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
 			<img src="imagenes/php.PNG" alt="Image">
-			<input type="text" name="search" placeholder="Buscar Archivo..">
+			<input class="search" type="text" name="search" placeholder="Buscar Archivo..">
 			<input type="submit" name="logout" class="logout" value="">
 		</form>
 	</header>
@@ -147,7 +163,7 @@
 		
 		<div class="showFiles">
 		<?php
-		if( isset( $metaArray )){
+		if( isset( $metaArray ) && !isset( $_POST['edit'] )){
 		$contFiles = 0;
 		$contFolders = 0;
 		$totalSize = 0;
@@ -176,6 +192,31 @@
 			<input class='button' type='submit' name='delete' value='Eliminar'> </input> </td></tr>
 		</table>
 		</form>";
+		}else if( isset( $_POST['edit'] )){
+			$index = $valuesChecked[0];
+			$value = $metaArray[ $index ];
+		echo"<h2>Editar Archivo</h2>
+		<div class='edit'>
+		  <form action= ".$_SERVER['PHP_SELF']." method='post'>
+			<label for='metaName'>Nombre</label>
+			<input  class='textEdit' type='text' name='metaName' placeholder='Nombre del archivo..' value = '" .$value['metaName']. "' >
+			<input  class='textEdit' type='text' name='metaIndex'  value = '" .$index. "' >
+
+			<label for='sharedWith'>Compartido Con:</label>
+			<select name='sharedWith' size='3' multiple='multiple' tabindex='1'>
+            <option value='11'>eleven</option>
+            <option value='12'>twelve</option>
+            <option value='13'>thirette</option>
+			<option value='11'>eleven</option>
+            <option value='12'>twelve</option>
+            <option value='13'>thirette</option>
+          </select>
+
+			<label for='description'>Descripcion</label>
+			<textarea class='textEdit' type='text'; name='metaDescription' placeholder='Descripcion del archivo..'>".$value['description']. "</textarea>
+			<input class='inputEdit' type='submit' name='submitEdit' value='Submit'>
+		  </form>
+		</div>";
 		}?>
 		</div>		
     </body>
