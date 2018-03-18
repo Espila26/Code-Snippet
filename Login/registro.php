@@ -96,7 +96,7 @@ button:hover {
 			$string = str_pad( serialize( $user ), 200 );
 			fwrite( $file, $string );
 			chdir('C:\\ProjectDirectories\\');// Change the directory where we are to the one we want
-			createDirectory( 'C:\\ProjectDirectories\\' + $_POST[ 'username' ] );
+			createDirectory( 'C:\\ProjectDirectories\\' . $_POST[ 'username' ] );
 			header("Location: registro.php");
 		}else{
 			echo "Passwords do not match or username already exists";

@@ -12,6 +12,8 @@
 	
 	$metaArray = readMetaFile( 'metaData.txt' );
 	$metaDataFile = initializeFile( 'metaData.txt' );
+	$usersfile = initializeFile( "usuarios.txt" );
+	$usersArray = unserializeUsersData( $usersfile );
 	if( isset( $_POST[ 'submit' ] ) ){
 		uploadFile( $metaDataFile, $metaArray );
 	}
@@ -21,20 +23,37 @@
 			$valuesChecked = getCheckBoxValues( $_POST[ 'metaDataCheckBox' ]);
 			if( isset( $_POST[ 'edit' ] )){
 				if(count($valuesChecked)>1){
+
 					header("Location: gestionarArchivos.php");
 					echo"solo es posible editar un archivo a la vez";//recordar meter errores en un session
 				}
 			}else{
-				//delete code
+				foreach ($valuesChecked as $id ) {
+				 $valueToDelete = $metaArray[$id];
+				 $valueToDelete['deleted'] = true;
+				 $metaArray[$id] = $valueToDelete;
+				 saveFileSerialized($metaDataFile, $metaArray);
+				}
 			}
+		}else{
+			header("Location: gestionarArchivos.php");
+			echo"se debe de seleccionar al menos un archivo";//recordar meter errores en un session
 		}
 	}
 	
 	if( isset( $_POST[ 'submitEdit' ] )){
+		$sharedWithString = '';
+		if( isset( $_POST[ 'sharedWith' ] )){
+			var_dump( $_POST[ 'sharedWith' ] );
+			foreach( $_POST[ 'sharedWith' ] as $selectedOption )
+				$sharedWithString = $sharedWithString . ',' . $selectedOption;
+		}
+		var_dump( $sharedWithString );
 		$index = $_POST[ 'metaIndex' ];
 		$valueToEdit = $metaArray[ $index ];
 		$valueToEdit[ 'metaName' ] = $_POST[ 'metaName' ];
 		$valueToEdit[ 'description' ] = $_POST[ 'metaDescription' ];
+		$valueToEdit[ 'sharedWith' ] = $sharedWithString;
 		$metaArray[ $index ] = $valueToEdit;
 		saveFileSerialized( $metaDataFile, $metaArray );
 	}
@@ -97,6 +116,14 @@
 		return $file;
 	}
 	
+	function unserializeUsersData( $file ){
+		$array = [];
+		while ($data = fread($file,200)) {
+			$array[] = unserialize( $data );
+		}
+		return $array;
+	}
+	
 	function buildMetaData( $file, $metaDataArray, $metaName , $name, $description, $path, $owner, $sharedWith, $size ){
 		$count = count( $metaDataArray );
 		$metaData = array( 'id' => $count, 'metaName' => $metaName, 'realName' => $name, 'description' => $description,
@@ -140,7 +167,6 @@
 		}
 		return $values;
 	}
-
 	?>
 	
     </head>
@@ -178,7 +204,7 @@
 			foreach( $metaArray as $array ){
 				if( $array['owner'] == $_SESSION[ 'userName' ] ){
 					echo"<tr>
-							<td> ".$array[ 'metaName' ]." </td>
+							<td> <a href='".$array[ 'path' ]."/".$array[ 'realName' ]."'> ".$array[ 'metaName' ]."  </a> </td>
 							<td> ".$array['size']." MB  </td>
 							<td> <input name=metaDataCheckBox[] type=checkbox value= ".$array['id']." > </td>
 						 </tr>";
@@ -203,15 +229,11 @@
 			<input  class='textEdit' type='text' name='metaIndex'  value = '" .$index. "' >
 
 			<label for='sharedWith'>Compartido Con:</label>
-			<select name='sharedWith' size='3' multiple='multiple' tabindex='1'>
-            <option value='11'>eleven</option>
-            <option value='12'>twelve</option>
-            <option value='13'>thirette</option>
-			<option value='11'>eleven</option>
-            <option value='12'>twelve</option>
-            <option value='13'>thirette</option>
-          </select>
-
+			<select name='sharedWith[]' size='3' multiple='multiple' tabindex='1'>";
+			foreach( $usersArray as $array ){
+				echo"<option value='".$array[ 'username' ]."'>".$array[ 'username' ]."</option>
+			";}echo"
+			</select>
 			<label for='description'>Descripcion</label>
 			<textarea class='textEdit' type='text'; name='metaDescription' placeholder='Descripcion del archivo..'>".$value['description']. "</textarea>
 			<input class='inputEdit' type='submit' name='submitEdit' value='Submit'>
