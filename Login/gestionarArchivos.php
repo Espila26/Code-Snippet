@@ -69,11 +69,11 @@
 		}else{
 			$name = $_FILES[ 'archivo' ][ 'name' ]."";
 			$size = round( $_FILES[ 'archivo' ][ 'size' ] / 1024 / 1024, 3);
-			$path = 'C:\\ProjectDirectories\\' . $_SESSION[ 'userName' ];
+			$path =  $_SESSION[ 'userName' ];
 			buildMetaData( $metaDataFile, $metaArray, "MetaData para: " . $name, $name, "uploadedFile",
                     		$path, $_SESSION[ 'userName' ], " ", $size, false);
 
-			chdir( 'C:\\ProjectDirectories\\' );// Change the directory where we are to the one we want
+			//chdir( 'C:\\ProjectDirectories\\' );// Change the directory where we are to the one we want
 			move_uploaded_file( $_FILES[ 'archivo' ][ 'tmp_name' ],
 			"".$_SESSION[ 'userName' ]."/" . $_FILES[ 'archivo' ][ 'name' ]);
 		}
@@ -204,7 +204,7 @@
 			foreach( $metaArray as $array ){
 				if( $array['owner'] == $_SESSION[ 'userName' ] && $array[ 'deleted' ] == false ){
 					echo"<tr>
-							<td> <a href='".$array[ 'path' ]."/".$array[ 'realName' ]."'> ".$array[ 'metaName' ]."  </a> </td>
+							<td> <a href='../".$array[ 'path' ]."/".$array[ 'realName' ]."' download> ".$array[ 'metaName' ]." </a> </td>
 							<td> ".$array['size']." MB  </td>
 							<td> <input name=metaDataCheckBox[] type=checkbox value= ".$array['id']." > </td>
 						 </tr>";
