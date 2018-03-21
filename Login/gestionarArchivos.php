@@ -20,7 +20,6 @@
 		uploadFile( $metaDataFile, $metaArray, $metaIndexfile, $metaIndexArray );
 	}
 	if( isset( $_POST[ 'edit' ] ) || isset( $_POST[ 'delete' ] ) || isset( $_POST[ 'show' ] )){
-		echo"yes";
 		if( isset( $_POST[ 'metaDataCheckBox' ] ) ){
 			$valuesChecked = getCheckBoxValues( $_POST[ 'metaDataCheckBox' ]);
 			if( isset( $_POST[ 'edit' ] ) || isset( $_POST[ 'show' ] )){
@@ -30,11 +29,15 @@
 					echo"solo es posible editar un archivo a la vez";//recordar meter errores en un session
 				}
 			}else{
+
 				foreach ($valuesChecked as $id ) {
 				 $valueToDelete = $metaArray[$id];
 				 $valueToDelete['deleted'] = true;
 				 $metaArray[$id] = $valueToDelete;
-				 saveFileSerialized($metaDataFile, $metaArray);
+				 $VarName = $metaIndexArray[$id];
+				 chdir($_SESSION[ 'userName' ]);
+				 unlink($VarName['realName']);
+				 saveFileSerialized($metaDataFile, $metaArray, false);
 				}
 			}
 		}else{
@@ -49,7 +52,6 @@
 		foreach( $_POST[ 'sharedWith' ] as $selectedOption )
 				$sharedWithString = $sharedWithString . ',' . $selectedOption;
 		}
-		var_dump( $sharedWithString );
 		$description ="";$metaName =""; $author="";$date="";$clasification = "";
 			
 		if( isset( $_POST[ 'addName' ] ))
@@ -97,45 +99,22 @@
 				$clasification = $_POST[ 'addClasification' ];
 			
 			$name = $_FILES[ 'archivo' ][ 'name' ]."";
-			$size = round( $_FILES[ 'archivo' ][ 'size' ] / 1024 / 1024, 3);
-			$path =  $_SESSION[ 'userName' ];
-			buildMetaData( $metaDataFile, $metaArray, $metaName, $name, $description,
-                    		$path, $_SESSION[ 'userName' ], " ", $size, false, $author, 
-							$date, $clasification,$metaIndexfile, $metaIndexArray);
+			$varExt = explode('.', $name);
+			if ($varExt[1] == 'php') {
+				$size = round( $_FILES[ 'archivo' ][ 'size' ] / 1024 / 1024, 3);
+				$path =  $_SESSION[ 'userName' ];
+				buildMetaData( $metaDataFile, $metaArray, $metaName, $name, $description,
+	                    		$path, $_SESSION[ 'userName' ], " ", $size, false, $author, 
+								$date, $clasification,$metaIndexfile, $metaIndexArray);
 
-			//chdir( 'C:\\ProjectDirectories\\' );// Change the directory where we are to the one we want
-			move_uploaded_file( $_FILES[ 'archivo' ][ 'tmp_name' ],
-			"".$_SESSION[ 'userName' ]."/" . $_FILES[ 'archivo' ][ 'name' ]);
-		}
-	}
-	
-	function getUserFiles(){//no se esta usando de momento, ver si puede ser util o si no, borrarla
-		$path = 'C:\\ProjectDirectories\\' . $_SESSION['userName'];
-		chdir( $path );
-		$directory = opendir( "." ); //ruta actual
-		$userFiles = [];
-		
-		while( $file = readdir( $directory )) //obtenemos un archivo y luego otro sucesivamente
-		{
-			if( $file != '.' && ( $file != '..' )){
-				$filesize = filesize($file); // bytes
-				if ( is_dir( $file ))//verificamos si es o no un directorio
-				{
-					$foundFile = array( 'name' => "[".$file . "]", 
-										'size' => $filesize = round($filesize / 1024 / 1024, 3),
-										'isFolder' => true ); // megabytes with 3 digit );
-					array_push( $userFiles, $foundFile ); //de ser un directorio lo envolvemos entre corchetes
-				}
-				else
-				{
-					$foundFile = array( 'name' => $file, 
-										'size' => $filesize = round($filesize / 1024 / 1024, 3),
-										'isFolder' => false ); // megabytes with 3 digit );
-					array_push( $userFiles, $foundFile );
-				}
+				//chdir( 'C:\\ProjectDirectories\\' );// Change the directory where we are to the one we want
+				move_uploaded_file( $_FILES[ 'archivo' ][ 'tmp_name' ],
+				"".$_SESSION[ 'userName' ]."/" . $_FILES[ 'archivo' ][ 'name' ]);
+			}else{
+				echo 'Solo archivos PHP';
 			}
+			
 		}
-		return $userFiles;
 	}
 	
 	function initializeFile( $path ){
@@ -171,7 +150,6 @@
 	}
 	
 	function saveFileSerialized( $file, $array, $reload ){
-		var_dump($array);
 		$newArray = [];
 		foreach( $array as $data){
 			array_push( $newArray, serialize( $data ));//Primero se mete cada array serializado dentro de un 
@@ -213,7 +191,8 @@
 		<form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
 			<img src="imagenes/php.PNG" alt="Image">
 			<input class="search" type="text" name="search" placeholder="Buscar Archivo..">
-			<input type="submit" name="logout" class="logout" value="">
+			<!--<input type="submit" name="logout" class="logout" value="">-->
+			<a href="#"><img src="imagenes/help.png" class="help"></a>
 		</form>
 	</header>
     <body>
@@ -263,6 +242,7 @@
 		$contFiles = 0;
 		$contFolders = 0;
 		$totalSize = 0;
+		$varSearch = true;
 		echo "<form action= ".$_SERVER['PHP_SELF']." method='post'>
 		<table>
 		<h2>Archivos de " .$_SESSION[ 'userName' ]. "</h2>
@@ -274,7 +254,17 @@
 			foreach( $metaIndexArray as $array ){
 				$index = $array[ 'id' ];
 				$current = $metaArray[ $index ];
-				if( $current['owner'] == $_SESSION[ 'userName' ] && $current[ 'deleted' ] == false ){
+
+				if (isset($_POST['search']) ) {
+					if (stripos($current['metaName'], $_POST['search']) !== false || $_POST['search'] == '') {
+						$varSearch = true;
+					}else{
+						$varSearch = false;
+					}
+
+				}
+
+				if( $current['owner'] == $_SESSION[ 'userName' ] && $current[ 'deleted' ] == false && $varSearch == true){
 					echo"<tr>
 							<td> <a href='../".$current[ 'path' ]."/".$array[ 'realName' ]."' download> ".$current[ 'metaName' ]." </a> </td>
 							<td> ".$current['size']." MB  </td>

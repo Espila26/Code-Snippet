@@ -49,6 +49,11 @@ img.avatar {
     padding: 16px;
 }
 
+a:link, a:visited { 
+  text-decoration:none;
+  color: white; 
+}
+
 span.psw {
     float: right;
     padding-top: 16px;
@@ -110,7 +115,7 @@ span.psw {
 
 <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
   <div class="imgcontainer">
-    <img src="img_avatar2.png" alt="Avatar" class="avatar">
+    <img src="imagenes/Login.png">
   </div>
 
   <div class="container">
@@ -121,15 +126,11 @@ span.psw {
     <input type="password" placeholder="Enter Password" name="psw" required>
         
     <button name="login" type="submit">Login</button>
-    <label>
-      <input type="checkbox" checked="checked" name="remember"> Remember me
-    </label>
   </div>
 
   <div class="container" style="background-color:#f1f1f1">
-	<button name="signIn" type="button" class="cancelbtn">Registrarse</button>
+	<button name="signIn" type="button" class="cancelbtn"><a href="registro.php">Registrarse</a></button>
     <button type="button" class="cancelbtn">Cancel</button>
-    <span class="psw">Forgot <a href="#">password?</a></span>
   </div>
 </form>
 

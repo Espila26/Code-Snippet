@@ -70,6 +70,12 @@ button:hover {
     display: table;
 }
 
+a:link, a:visited { 
+  text-decoration:none;
+  color: white; 
+}
+
+
 /* Change styles for cancel button and signup button on extra small screens */
 @media screen and (max-width: 300px) {
     .cancelbtn, .signupbtn {
@@ -146,8 +152,9 @@ button:hover {
     <input type="password" placeholder="Ingresa de nuevo la Contraseña" name="psw-repeat" required>
 
     <div class="clearfix">
-      <button type="button" class="cancelbtn">Cancelar</button>
+      <button type="button" class="cancelbtn"><a href="Login.php">Cancelar</a></button>
       <button name="signUp" type="submit" class="signupbtn">Registrar</button>
+
     </div>
   </div>
 </form>
