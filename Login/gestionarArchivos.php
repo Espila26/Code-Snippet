@@ -47,12 +47,7 @@
 	}
 	
 	if( isset( $_POST[ 'submitEdit' ] )){
-		$sharedWithString = '';
-		if( isset( $_POST[ 'sharedWith' ] )){
-		foreach( $_POST[ 'sharedWith' ] as $selectedOption )
-				$sharedWithString = $sharedWithString . ',' . $selectedOption;
-		}
-		$description ="";$metaName =""; $author="";$date="";$clasification = "";
+		$description ="";$metaName =""; $author="";$date="";$clasification = "";$sharedWith = [];
 			
 		if( isset( $_POST[ 'addName' ] ))
 			$metaName = $_POST[ 'addName' ];
@@ -64,6 +59,8 @@
 			$date = $_POST[ 'addDate' ];
 		if( isset( $_POST[ 'addClasification' ] ))
 			$clasification = $_POST[ 'addClasification' ];
+		if( isset( $_POST[ 'sharedWith' ] ))
+			$sharedWith = $_POST[ 'sharedWith' ];
 		$index = $_POST[ 'metaIndex' ];
 		$valueToEdit = $metaArray[ $index ];
 		$valueToEdit[ 'metaName' ] = $metaName;
@@ -71,7 +68,7 @@
 		$valueToEdit[ 'author' ] = $author;
 		$valueToEdit[ 'date' ] = $date;
 		$valueToEdit[ 'clasification' ] = $clasification;
-		$valueToEdit[ 'sharedWith' ] = $sharedWithString;
+		$valueToEdit[ 'sharedWith' ] = $sharedWith;
 		$metaArray[ $index ] = $valueToEdit;
 		saveFileSerialized( $metaDataFile, $metaArray, true );
 	}
@@ -80,7 +77,7 @@
 		if ( $_FILES[ 'archivo' ][ "error" ] > 0 ){
 			echo "Error: " . $_FILES[ 'archivo' ][ 'error' ] . "<br>";
 		}else{
-			$description ="";$metaName =""; $author="";$date="";$clasification = "";
+			$description ="";$metaName =""; $author="";$date="";$clasification = "";$sharedWith = [];
 			
 			if( isset( $_POST[ 'addName' ] ))
 				$metaName = $_POST[ 'addName' ];
@@ -228,16 +225,16 @@
 				}
 				echo"</select>
 				<label for='addDescription'>Descripcion</label>
-				<textarea class='textAdd' type='text'; name='addDescription' placeholder='Descripcion del archivo..' value='".$current[ 'description' ]."'></textarea>";
+				<textarea class='textAdd' type='text'; name='addDescription' placeholder='Descripcion del archivo..' value='".$current[ 'description' ]."'>".$current[ 'description' ]."</textarea>";
 				if( !isset( $_POST[ 'edit' ] ) && !isset( $_POST[ 'show' ] ) ){
 				echo"<input class='custom-file-input' type='file' name='archivo' id='archivo'></input></br></br>
 				<input class='button'  type='submit' name='submit' value='Subir archivo'></input>";
 				}else if( isset( $_POST[ 'edit' ] ) ){
-					echo"<input class='inputEdit' type='submit' name='submitEdit' value='Submit'>
+					echo"<input class='button' type='submit' name='submitEdit' value='Editar'>
 					<input  class='textEdit' type='hidden' name='metaIndex'  value = '" .$index. "' >";
 				}
-				echo"
-			</form>
+				echo"<input  class='button' type='submit' name='new'  value = '+' >";
+			echo"</form>
 		</div>
 		
 		<div class='showFiles'>";
@@ -304,8 +301,7 @@
 				$index = $array[ 'id' ];
 				$current = $metaArray[ $index ];
 				$users = $current['sharedWith'];
-
-				if( $users != ' ' && in_array( $_SESSION[ 'userName' ], $users )){
+				if( $current[ 'deleted' ] == false && ( $users != ' ' && in_array( $_SESSION[ 'userName' ], $users ))){
 					echo"<tr>
 							<td> <a href='../".$current[ 'path' ]."/".$array[ 'realName' ]."' download> ".$current[ 'metaName' ]." </a> </td>
 							<td> ".$current['size']." MB  </td>
