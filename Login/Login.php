@@ -79,6 +79,11 @@ span.psw {
 	while ($data = fread($file,200)) {
 		$array[] = unserialize( $data );
 	}
+	
+	if( isset( $_SESSION[ 'userName' ])){
+		unset( $_SESSION[ 'userName' ] );
+	}
+	
 	if( isset( $_POST[ 'login' ] ) ){
 		$userWasFound = false;
 		if( $_POST[ 'uname' ] && $_POST[ 'psw' ] ){
@@ -110,8 +115,6 @@ span.psw {
 
 </head>
 <body>
-
-<h2>Login Form</h2>
 
 <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
   <div class="imgcontainer">

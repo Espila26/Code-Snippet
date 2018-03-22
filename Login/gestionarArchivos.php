@@ -75,11 +75,6 @@
 		$metaArray[ $index ] = $valueToEdit;
 		saveFileSerialized( $metaDataFile, $metaArray, true );
 	}
-		
-	if( isset( $_POST[ 'logout' ] )){
-		unset( $_SESSION[ 'userName' ] );
-		header("Location: Login.php");
-	}
 	
 	function uploadFile( $metaDataFile, $metaArray, $metaIndexfile, $metaIndexArray ){
 		if ( $_FILES[ 'archivo' ][ "error" ] > 0 ){
@@ -191,7 +186,7 @@
 		<form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
 			<img src="imagenes/php.PNG" alt="Image">
 			<input class="search" type="text" name="search" placeholder="Buscar Archivo..">
-			<!--<input type="submit" name="logout" class="logout" value="">-->
+			<a href="Login.php" name="logout" class="logout" value=""></a>
 			<a href="#"><img src="imagenes/help.png" class="help"></a>
 		</form>
 	</header>
