@@ -186,7 +186,7 @@
 			<img src="imagenes/php.PNG" alt="Image">
 			<input class="search" type="text" name="search" placeholder="Buscar Archivo..">
 			<a href="Login.php" name="logout" class="logout" value=""></a>
-			<a href="#"><img src="imagenes/help.png" class="help"></a>
+			<a href="ayuda.html"><img src="imagenes/help.png" class="help"></a>
 		</form>
 	</header>
     <body>

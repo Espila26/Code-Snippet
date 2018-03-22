@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 body {font-family: Arial, Helvetica, sans-serif;}
@@ -49,10 +50,6 @@ img.avatar {
     padding: 16px;
 }
 
-a:link, a:visited { 
-  text-decoration:none;
-  color: white; 
-}
 
 span.psw {
     float: right;
