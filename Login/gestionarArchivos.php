@@ -234,7 +234,7 @@
 				<input class='button'  type='submit' name='submit' value='Subir archivo'></input>";
 				}else if( isset( $_POST[ 'edit' ] ) ){
 					echo"<input class='inputEdit' type='submit' name='submitEdit' value='Submit'>
-					<input  class='textEdit' type='text' name='metaIndex'  value = '" .$index. "' >";
+					<input  class='textEdit' type='hidden' name='metaIndex'  value = '" .$index. "' >";
 				}
 				echo"
 			</form>
