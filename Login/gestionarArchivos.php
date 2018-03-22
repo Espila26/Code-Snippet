@@ -200,6 +200,9 @@
 			$title = "Editar Archivo:";
 			$users = $current[ 'sharedWith' ];
 		}
+		if( isset( $_POST[ 'show' ] )){
+			$title = "Archivo:";
+		}
 		if( !isset( $current ) ){
 			$current = array( 'metaName' => '', 'description' => '', 'path' => '', 'owner' => '', 'sharedWith' => '', 
 							  'size' => '', 'deleted' => '', 'author' => '', 'date' => '', 'clasification' => '');
