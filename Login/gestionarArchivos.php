@@ -71,7 +71,7 @@
 		$valueToEdit[ 'author' ] = $author;
 		$valueToEdit[ 'date' ] = $date;
 		$valueToEdit[ 'clasification' ] = $clasification;
-		$valueToEdit[ 'sharedWith' ] = '';
+		$valueToEdit[ 'sharedWith' ] = $sharedWithString;
 		$metaArray[ $index ] = $valueToEdit;
 		saveFileSerialized( $metaDataFile, $metaArray, true );
 	}
@@ -92,6 +92,8 @@
 				$date = $_POST[ 'addDate' ];
 			if( isset( $_POST[ 'addClasification' ] ))
 				$clasification = $_POST[ 'addClasification' ];
+			if( isset( $_POST[ 'sharedWith' ] ))
+				$sharedWith = $_POST[ 'sharedWith' ];
 			
 			$name = $_FILES[ 'archivo' ][ 'name' ]."";
 			$varExt = explode('.', $name);
@@ -99,7 +101,7 @@
 				$size = round( $_FILES[ 'archivo' ][ 'size' ] / 1024 / 1024, 3);
 				$path =  $_SESSION[ 'userName' ];
 				buildMetaData( $metaDataFile, $metaArray, $metaName, $name, $description,
-	                    		$path, $_SESSION[ 'userName' ], " ", $size, false, $author, 
+	                    		$path, $_SESSION[ 'userName' ], $sharedWith, $size, false, $author, 
 								$date, $clasification,$metaIndexfile, $metaIndexArray);
 
 				//chdir( 'C:\\ProjectDirectories\\' );// Change the directory where we are to the one we want
@@ -199,6 +201,7 @@
 			$index = $valuesChecked[0];
 			$current = $metaArray[ $index ];
 			$title = "Editar Archivo:";
+			$users = $current[ 'sharedWith' ];
 		}
 		if( !isset( $current ) ){
 			$current = array( 'metaName' => '', 'description' => '', 'path' => '', 'owner' => '', 'sharedWith' => '', 
@@ -217,7 +220,12 @@
 				<label for='sharedWith'>Compartido Con:</label>
 				<select name='sharedWith[]' size='1' multiple='multiple' tabindex='1' >";
 				foreach( $usersArray as $array ){
-					echo"<option value='".$array[ 'username' ]."'>".$array[ 'username' ]."</option>";}
+					if( isset( $users ) && in_array($array[ 'username' ], $users)){
+					echo"<option value='".$array[ 'username' ]."' selected='selected'>".$array[ 'username' ]."</option>";
+					}else if( $array[ 'username' ] != $_SESSION['userName'] ){
+						echo"<option value='".$array[ 'username' ]."'>".$array[ 'username' ]."</option>";
+					}
+				}
 				echo"</select>
 				<label for='addDescription'>Descripcion</label>
 				<textarea class='textAdd' type='text'; name='addDescription' placeholder='Descripcion del archivo..' value='".$current[ 'description' ]."'></textarea>";
@@ -275,7 +283,44 @@
 			<input class='button' type='submit' name='delete' value='Eliminar'> </input> </td></tr>
 		</table>
 		</form>";
+		}
+		echo"</div>	
+
+		<div class='showFiles'>";
+		if( isset( $metaArray ) ){
+		$contFiles = 0;
+		$contFolders = 0;
+		$totalSize = 0;
+		$varSearch = true;
+		echo "<form action= ".$_SERVER['PHP_SELF']." method='post'>
+		<table>
+		<h2>Archivos compartidos con: " .$_SESSION[ 'userName' ]. "</h2>
+			<tr>
+				<th>Nombre</th>
+				<th>Tamanno</th>
+				<th>Accion</th>
+			</tr>";
+			foreach( $metaIndexArray as $array ){
+				$index = $array[ 'id' ];
+				$current = $metaArray[ $index ];
+				$users = $current['sharedWith'];
+
+				if( $users != ' ' && in_array( $_SESSION[ 'userName' ], $users )){
+					echo"<tr>
+							<td> <a href='../".$current[ 'path' ]."/".$array[ 'realName' ]."' download> ".$current[ 'metaName' ]." </a> </td>
+							<td> ".$current['size']." MB  </td>
+							<td> <input name=metaDataCheckBox[] type=checkbox value= ".$array['id']." > </td>
+						 </tr>";
+						 $contFiles++;
+						 $totalSize = $totalSize + $current[ 'size' ];
+				}
+			}
+			echo" <tr><td></td><td>".$contFiles." Archivos(" .$totalSize. " MB) </td>
+			<td> <input class='button' type='submit' name='show' value='Mostrar'> </input></td></tr>
+		</table>
+		</form>";
 		}?>
-		</div>		
+		</div>	
+		
     </body>
 </html>
