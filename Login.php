@@ -56,6 +56,11 @@ span.psw {
     padding-top: 16px;
 }
 
+a:link, a:visited { 
+  text-decoration:none;
+  color: white; 
+}
+
 /* Change styles for span and cancel button on extra small screens */
 @media screen and (max-width: 300px) {
     span.psw {
